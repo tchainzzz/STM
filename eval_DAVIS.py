@@ -36,6 +36,7 @@ def get_arguments():
     parser.add_argument("-y", type=int, help="year", required=True)
     parser.add_argument("-viz", help="Save visualization", action="store_true")
     parser.add_argument("-D", type=str, help="path to data",default='/local/DATA')
+    parser.add_argument("--code-name", type=str, help="name of folder to save results", required=True)
     return parser.parse_args()
 
 args = get_arguments()
@@ -45,6 +46,7 @@ YEAR = args.y
 SET = args.s
 VIZ = args.viz
 DATA_ROOT = args.D
+MASTER_DATA_ROOT = os.path.join(os.environ['HOME'], 'davis-2017/DAVIS')
 
 # Model and version
 MODEL = 'STM'
@@ -59,7 +61,7 @@ if VIZ:
     print('--- Require FFMPEG for encoding, Check folder ./viz')
 
 
-palette = Image.open(DATA_ROOT + '/Annotations/480p/blackswan/00000.png').getpalette()
+palette = Image.open(MASTER_DATA_ROOT + '/Annotations/480p/blackswan/00000.png').getpalette()
 
 def Run_video(Fs, Ms, num_frames, num_objects, Mem_every=None, Mem_number=None):
     # initialize storage tensors
@@ -110,7 +112,7 @@ pth_path = 'STM_weights.pth'
 print('Loading weights:', pth_path)
 model.load_state_dict(torch.load(pth_path))
 
-code_name = '{}_DAVIS_{}{}'.format(MODEL,YEAR,SET)
+code_name = args.code_name # '{}_DAVIS_{}{}'.format(MODEL,YEAR,SET)
 print('Start Testing:', code_name)
 
 
@@ -119,6 +121,8 @@ for seq, V in enumerate(Testloader):
     seq_name = info['name'][0]
     num_frames = info['num_frames'][0].item()
     print('[{}]: num_frames: {}, num_objects: {}'.format(seq_name, num_frames, num_objects[0][0]))
+    if num_frames == 0:
+        continue
     
     pred, Es = Run_video(Fs, Ms, num_frames, num_objects, Mem_every=5, Mem_number=None)
         

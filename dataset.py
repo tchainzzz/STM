@@ -12,12 +12,12 @@ import glob
 class DAVIS_MO_Test(data.Dataset):
     # for multi object, do shuffling
 
-    def __init__(self, root, imset='2017/train.txt', resolution='480p', single_object=False):
+    def __init__(self, root, base_root=os.path.join(os.environ["HOME"], "davis-2017/DAVIS"), imset='2017/train.txt', resolution='480p', single_object=False):
         self.root = root
-        self.mask_dir = os.path.join(root, 'Annotations', resolution)
-        self.mask480_dir = os.path.join(root, 'Annotations', '480p')
+        self.mask_dir = os.path.join(base_root, 'Annotations', resolution)
+        self.mask480_dir = os.path.join(base_root, 'Annotations', '480p')
         self.image_dir = os.path.join(root, 'JPEGImages', resolution)
-        _imset_dir = os.path.join(root, 'ImageSets')
+        _imset_dir = os.path.join(base_root, 'ImageSets')
         _imset_f = os.path.join(_imset_dir, imset)
 
         self.videos = []
